@@ -1,0 +1,57 @@
+const container = document.getElementById('gameContainer');
+let tiles = [];
+
+function initializeGame() {
+    // Create an array of numbers with an empty space
+    tiles = [...Array(8).keys()].map(x => x + 1); // Change to 15 for 4x4 grid
+    tiles.push(""); // Add the empty space
+    shuffle(tiles);
+    renderTiles();
+}
+
+function shuffle(array) {
+    // Simple shuffle for random arrangement
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function renderTiles() {
+    container.innerHTML = ""; // Clear existing tiles
+    tiles.forEach((tile, index) => {
+        const tileElement = document.createElement('div');
+        tileElement.classList.add('tile');
+        if (tile === "") {
+            tileElement.classList.add('empty');
+        } else {
+            tileElement.innerText = tile;
+            tileElement.addEventListener('click', () => moveTile(index));
+        }
+        container.appendChild(tileElement);
+    });
+}
+
+function moveTile(index) {
+    const emptyIndex = tiles.indexOf("");
+    const isAdjacent = [1, -1, 3, -3].includes(emptyIndex - index); // Adjust to 4 for 4x4 grid
+
+    if (isAdjacent) {
+        // Swap selected tile with the empty tile
+        [tiles[emptyIndex], tiles[index]] = [tiles[index], tiles[emptyIndex]];
+        renderTiles();
+        if (isSolved()) {
+            setTimeout(() => alert("Congratulations! You solved the puzzle!"), 100);
+        }
+    }
+}
+
+function isSolved() {
+    // Check if tiles are in ascending order
+    for (let i = 0; i < tiles.length - 1; i++) {
+        if (tiles[i] !== i + 1) return false;
+    }
+    return true;
+}
+
+initializeGame();
